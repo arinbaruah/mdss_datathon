@@ -5,23 +5,38 @@ format: html
 editor: visual
 ---
 
-## Quarto
-
-Quarto enables you to weave together content and executable code into a finished document. To learn more about Quarto see <https://quarto.org>.
-
-## Running Code
-
-When you click the **Render** button a document will be generated that includes both content and the output of embedded code. You can embed code like this:
-
 ```{r}
-1 + 1
+library(tidyverse)
+library(ggplot2)
+library(visdat)
+library(janitor)
 ```
 
-You can add options to executable code like this
 
 ```{r}
-#| echo: false
-2 * 2
+df <- read_csv("data-raw/data_waste.csv")
+head(df)
+```
+Let us clean the names of the variables
+
+```{r}
+df_waste <- clean_names(df)
+head(df_waste)
 ```
 
-The `echo: false` option disables the printing of code (only output is displayed).
+# Hazardous waste
+
+```{r}
+df_haz <- df_waste %>% filter(category == "Hazardous wastes")
+df_haz_tot <- df_haz %>% filter(stream == "Total")
+df_haz_total <- df_haz_tot %>% group_by(year,jurisdiction,category) %>% 
+  summarise(Tonnes = sum(tonnes)) %>% ungroup()
+```
+
+
+```{r}
+pl1 <- ggplot(data = df_haz_total,aes(x = year,y = Tonnes)) +
+  geom_point() + theme(axis.text.x = element_text(angle = 45,size=5)) + facet_wrap(~jurisdiction)
+pl1
+```
+
