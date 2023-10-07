@@ -102,55 +102,16 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </header>
 
 <div class="cell">
-<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stderr">
-<pre><code>── Attaching core tidyverse packages ──────────────────────── tidyverse 2.0.0 ──
-✔ dplyr     1.1.3     ✔ readr     2.1.4
-✔ forcats   1.0.0     ✔ stringr   1.5.0
-✔ ggplot2   3.4.3     ✔ tibble    3.2.1
-✔ lubridate 1.9.3     ✔ tidyr     1.3.0
-✔ purrr     1.0.2     
-── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
-✖ dplyr::filter() masks stats::filter()
-✖ dplyr::lag()    masks stats::lag()
-ℹ Use the conflicted package (&lt;http://conflicted.r-lib.org/&gt;) to force all conflicts to become errors</code></pre>
-</div>
-<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(visdat)</span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(janitor)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stderr">
-<pre><code>
-Attaching package: 'janitor'
-
-The following objects are masked from 'package:stats':
-
-    chisq.test, fisher.test</code></pre>
-</div>
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(visdat)</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(janitor)</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(plotly)</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggthemes)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>df <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"data-raw/data_waste.csv"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stderr">
-<pre><code>New names:
-• `` -&gt; `...17`</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Warning: One or more parsing issues, call `problems()` on your data frame for details,
-e.g.:
-  dat &lt;- vroom(...)
-  problems(dat)</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Rows: 71496 Columns: 17
-── Column specification ────────────────────────────────────────────────────────
-Delimiter: ","
-chr (15): Year, Jurisdiction, Category, Type, Classification, Total type, St...
-num  (1): Tonnes
-lgl  (1): ...17
-
-ℹ Use `spec()` to retrieve the full column specification for this data.
-ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
-</div>
-<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(df)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>df <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"data-raw/data_waste.csv"</span>)</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(df)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 6 × 17
   Year      Jurisdiction Category  Type      Classification `Total type` Stream
@@ -168,43 +129,78 @@ lgl  (1): ...17
 </div>
 <p>Let us clean the names of the variables</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>df_waste <span class="ot">&lt;-</span> <span class="fu">clean_names</span>(df)</span>
-<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(df_waste)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>df_waste <span class="ot">&lt;-</span> <span class="fu">clean_names</span>(df)</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>df_waste[<span class="fu">c</span>(<span class="st">"start_year"</span>,<span class="st">"end_year"</span>)] <span class="ot">&lt;-</span> (<span class="fu">str_split_fixed</span>(df_waste<span class="sc">$</span>year,<span class="st">"-"</span>,<span class="dv">2</span>))</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>df_waste<span class="sc">$</span>start_year <span class="ot">&lt;-</span> <span class="fu">as.numeric</span>(df_waste<span class="sc">$</span>start_year)</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>df_waste<span class="sc">$</span>end_year <span class="ot">&lt;-</span> <span class="fu">as.numeric</span>(df_waste<span class="sc">$</span>end_year)</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>df_waste<span class="ot">&lt;-</span> df_waste<span class="sc">%&gt;%</span> <span class="fu">select</span>(<span class="sc">-</span>year) </span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(df_waste)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code># A tibble: 6 × 17
-  year   jurisdiction category type  classification total_type stream management
-  &lt;chr&gt;  &lt;chr&gt;        &lt;chr&gt;    &lt;chr&gt; &lt;chr&gt;          &lt;chr&gt;      &lt;chr&gt;  &lt;chr&gt;     
-1 2020-… ACT          Biosoli… Bios… Type           &lt;NA&gt;       C&amp;I    Other dis…
-2 2020-… ACT          Biosoli… Bios… Type           &lt;NA&gt;       C&amp;I    Recycling 
-3 2020-… ACT          Biosoli… Bios… Type           &lt;NA&gt;       Total  Other dis…
-4 2020-… ACT          Biosoli… Bios… Type           &lt;NA&gt;       Total  Recycling 
-5 2020-… ACT          Biosoli… &lt;NA&gt;  Category       &lt;NA&gt;       C&amp;I    Other dis…
-6 2020-… ACT          Biosoli… &lt;NA&gt;  Category       &lt;NA&gt;       C&amp;I    Recycling 
-# ℹ 9 more variables: fate &lt;chr&gt;, tonnes &lt;dbl&gt;, core_or_non_core &lt;chr&gt;,
-#   sub_stream &lt;chr&gt;, cat_order &lt;chr&gt;, cat_no &lt;chr&gt;, type_order &lt;chr&gt;,
-#   type_no &lt;chr&gt;, x17 &lt;lgl&gt;</code></pre>
+<pre><code># A tibble: 6 × 18
+  jurisdiction category  type  classification total_type stream management fate 
+  &lt;chr&gt;        &lt;chr&gt;     &lt;chr&gt; &lt;chr&gt;          &lt;chr&gt;      &lt;chr&gt;  &lt;chr&gt;      &lt;chr&gt;
+1 ACT          Biosolids Bios… Type           &lt;NA&gt;       C&amp;I    Other dis… Disp…
+2 ACT          Biosolids Bios… Type           &lt;NA&gt;       C&amp;I    Recycling  Recy…
+3 ACT          Biosolids Bios… Type           &lt;NA&gt;       Total  Other dis… Disp…
+4 ACT          Biosolids Bios… Type           &lt;NA&gt;       Total  Recycling  Recy…
+5 ACT          Biosolids &lt;NA&gt;  Category       &lt;NA&gt;       C&amp;I    Other dis… Disp…
+6 ACT          Biosolids &lt;NA&gt;  Category       &lt;NA&gt;       C&amp;I    Recycling  Recy…
+# ℹ 10 more variables: tonnes &lt;dbl&gt;, core_or_non_core &lt;chr&gt;, sub_stream &lt;chr&gt;,
+#   cat_order &lt;chr&gt;, cat_no &lt;chr&gt;, type_order &lt;chr&gt;, type_no &lt;chr&gt;, x17 &lt;lgl&gt;,
+#   start_year &lt;dbl&gt;, end_year &lt;dbl&gt;</code></pre>
 </div>
 </div>
 <section id="hazardous-waste" class="level1">
 <h1>Hazardous waste</h1>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>df_haz <span class="ot">&lt;-</span> df_waste <span class="sc">%&gt;%</span> <span class="fu">filter</span>(category <span class="sc">==</span> <span class="st">"Hazardous wastes"</span>)</span>
-<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>df_haz_tot <span class="ot">&lt;-</span> df_haz <span class="sc">%&gt;%</span> <span class="fu">filter</span>(stream <span class="sc">==</span> <span class="st">"Total"</span>)</span>
-<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>df_haz_total <span class="ot">&lt;-</span> df_haz_tot <span class="sc">%&gt;%</span> <span class="fu">group_by</span>(year,jurisdiction,category) <span class="sc">%&gt;%</span> </span>
-<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">Tonnes =</span> <span class="fu">sum</span>(tonnes)) <span class="sc">%&gt;%</span> <span class="fu">ungroup</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stderr">
-<pre><code>`summarise()` has grouped output by 'year', 'jurisdiction'. You can override
-using the `.groups` argument.</code></pre>
-</div>
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>df_haz <span class="ot">&lt;-</span> df_waste <span class="sc">%&gt;%</span> <span class="fu">filter</span>(category <span class="sc">==</span> <span class="st">"Hazardous wastes"</span>)</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>df_haz_tot <span class="ot">&lt;-</span> df_haz <span class="sc">%&gt;%</span> <span class="fu">filter</span>(stream <span class="sc">==</span> <span class="st">"Total"</span>)</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>df_haz_total <span class="ot">&lt;-</span> df_haz_tot <span class="sc">%&gt;%</span> <span class="fu">group_by</span>(start_year,jurisdiction,category) <span class="sc">%&gt;%</span> </span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">Tonnes =</span> <span class="fu">sum</span>(tonnes)) <span class="sc">%&gt;%</span> </span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>() </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>pl1 <span class="ot">&lt;-</span> <span class="fu">ggplot</span>(<span class="at">data =</span> df_haz_total,<span class="fu">aes</span>(<span class="at">x =</span> year,<span class="at">y =</span> Tonnes)) <span class="sc">+</span></span>
-<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>() <span class="sc">+</span> <span class="fu">theme</span>(<span class="at">axis.text.x =</span> <span class="fu">element_text</span>(<span class="at">angle =</span> <span class="dv">45</span>,<span class="at">size=</span><span class="dv">5</span>)) <span class="sc">+</span> <span class="fu">facet_wrap</span>(<span class="sc">~</span>jurisdiction)</span>
-<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>pl1</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>pl1 <span class="ot">&lt;-</span> <span class="fu">ggplot</span>(<span class="at">data =</span> df_haz_total,<span class="fu">aes</span>(<span class="at">x =</span> start_year,<span class="at">y =</span> Tonnes)) <span class="sc">+</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>() <span class="sc">+</span> <span class="fu">geom_point</span>(<span class="at">color=</span><span class="st">'red'</span>) <span class="sc">+</span> <span class="fu">theme</span>(<span class="at">axis.text.x =</span> <span class="fu">element_text</span>(<span class="at">angle =</span> <span class="dv">45</span>,<span class="at">size=</span><span class="dv">5</span>)) <span class="sc">+</span> <span class="fu">facet_wrap</span>(<span class="sc">~</span>jurisdiction) <span class="sc">+</span> <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Year"</span>,<span class="at">y =</span> <span class="st">"Tons"</span>,<span class="at">title =</span> <span class="st">"Hazardous waste generated in each state"</span>,<span class="at">subtitle =</span> <span class="st">"2006-2021"</span>) <span class="sc">+</span> <span class="fu">theme_classic</span>()</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>pl1</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <p><img src="MDSS_datathon_files/figure-html/unnamed-chunk-5-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
+<ol type="1">
+<li>NSW accounts for the highest hazardous waste in the whole of Australia with close to 8.5 MT. The hazardous wastes are on a rising trend.</li>
+<li>QLD is observed to record constant generation of hazardous waste each year with approximate 6 MT.</li>
+<li>VIC is observed to record a rising trend of hazardous waste in recent years with close to 5.75 MT in 2021.</li>
+</ol>
+<section id="how-is-the-hazardous-waste-dealt-with-in-each-state" class="level2">
+<h2 class="anchored" data-anchor-id="how-is-the-hazardous-waste-dealt-with-in-each-state">How is the Hazardous waste dealt with in each state ?</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>haz_jurisdictions <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"NSW"</span>,<span class="st">"Vic"</span>,<span class="st">"Qld"</span>)</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>df_haz_subset <span class="ot">&lt;-</span> df_haz_tot <span class="sc">%&gt;%</span> <span class="fu">filter</span>(jurisdiction <span class="sc">%in%</span> haz_jurisdictions)</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>df_haz_man <span class="ot">&lt;-</span> df_haz_subset <span class="sc">%&gt;%</span> <span class="fu">group_by</span>(jurisdiction,management) <span class="sc">%&gt;%</span> </span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">Tonnes =</span> <span class="fu">sum</span>(tonnes)) <span class="sc">%&gt;%</span> <span class="fu">ungroup</span>()</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>pl2 <span class="ot">&lt;-</span> <span class="fu">ggplot</span>(<span class="at">data =</span> df_haz_man,<span class="fu">aes</span>(<span class="at">x =</span> <span class="fu">reorder</span>(management,Tonnes),<span class="at">y =</span> Tonnes<span class="sc">/</span><span class="dv">10</span><span class="sc">^</span><span class="dv">6</span>)) <span class="sc">+</span> <span class="fu">geom_col</span>(<span class="at">fill =</span> <span class="st">"lightgray"</span>,<span class="at">color =</span> <span class="st">"black"</span>) <span class="sc">+</span> </span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span>jurisdiction) <span class="sc">+</span> <span class="fu">coord_flip</span>() <span class="sc">+</span> <span class="fu">geom_col</span>(<span class="at">data =</span> <span class="sc">~</span><span class="fu">filter</span>(.x, management <span class="sc">==</span> <span class="st">"Landfill"</span>),<span class="at">fill =</span> <span class="st">"darkred"</span>) <span class="sc">+</span> <span class="fu">geom_label</span>(<span class="at">data =</span> <span class="sc">~</span><span class="fu">filter</span>(.x, management <span class="sc">==</span> <span class="st">"Landfill"</span>),<span class="fu">aes</span>(<span class="at">label =</span> <span class="fu">round</span>(Tonnes<span class="sc">/</span><span class="dv">10</span><span class="sc">^</span><span class="dv">6</span>,<span class="dv">1</span>),<span class="at">hjust=</span><span class="dv">1</span>)) <span class="sc">+</span> <span class="fu">geom_col</span>(<span class="at">data =</span> <span class="sc">~</span><span class="fu">filter</span>(.x, management <span class="sc">==</span> <span class="st">"Energy from waste facility"</span>),<span class="at">fill =</span> <span class="st">"green"</span>) <span class="sc">+</span> <span class="fu">geom_label</span>(<span class="at">data =</span> <span class="sc">~</span><span class="fu">filter</span>(.x, management <span class="sc">==</span> <span class="st">"Landfill"</span>),<span class="fu">aes</span>(<span class="at">label =</span> <span class="fu">round</span>(Tonnes<span class="sc">/</span><span class="dv">10</span><span class="sc">^</span><span class="dv">6</span>,<span class="dv">1</span>),<span class="at">hjust=</span><span class="dv">1</span>)) <span class="sc">+</span> <span class="fu">geom_label</span>(<span class="at">data =</span> <span class="sc">~</span><span class="fu">filter</span>(.x, management <span class="sc">==</span> <span class="st">"Energy from waste facility"</span>),<span class="fu">aes</span>(<span class="at">label =</span> <span class="fu">round</span>(Tonnes<span class="sc">/</span><span class="dv">10</span><span class="sc">^</span><span class="dv">6</span>,<span class="dv">1</span>),<span class="at">hjust=</span><span class="sc">-</span><span class="fl">0.5</span>)) <span class="sc">+</span> </span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Waste management technique"</span>,<span class="at">y =</span> <span class="st">"Mega tonnes of waste"</span>,<span class="at">title =</span><span class="st">"Hazardous waste management in the top 3 </span><span class="sc">\n</span><span class="st"> waste producing states"</span>,<span class="at">subtitle =</span> <span class="st">"2006-2021"</span>) <span class="sc">+</span> <span class="fu">theme_economist</span>() </span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>pl2</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="MDSS_datathon_files/figure-html/unnamed-chunk-6-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>We observe that the:</p>
+<ol type="1">
+<li><p>In all the three states (NSW,Qld,Vic), majority of the hazardous waste are managed through disposing in landfills. While this may be a temporary solution, the implications can be quite devastating <strong>as such waste normally take years to decompose and start polluting the water ways as well as pottable water resources.</strong></p></li>
+<li><p>While there have been efforts to utilise hazardous waste to produce energy, it is still a long way behind, with more concerted efforts required by each state to curb disposal of hazardous waste into landfills and obtain clean energy.</p></li>
+<li><p>While <strong>VIC is observed to generate lesser hazardous waste than NSW and QLD, they’re also leading with the highest energy production from waste facilities</strong> with approximately 1.6 Mega tonnes of waste utilised.</p></li>
+</ol>
+</section>
 </section>
 
 </main>

@@ -3,6 +3,9 @@ title: "MDSS Datathon"
 author: "Arindam Baruah"
 format: html
 editor: visual
+execute: 
+  warning: false
+  message: false
 ---
 
 ```{r}
@@ -10,6 +13,8 @@ library(tidyverse)
 library(ggplot2)
 library(visdat)
 library(janitor)
+library(plotly)
+library(ggthemes)
 ```
 
 
@@ -21,6 +26,14 @@ Let us clean the names of the variables
 
 ```{r}
 df_waste <- clean_names(df)
+
+
+df_waste[c("start_year","end_year")] <- (str_split_fixed(df_waste$year,"-",2))
+df_waste$start_year <- as.numeric(df_waste$start_year)
+df_waste$end_year <- as.numeric(df_waste$end_year)
+
+df_waste<- df_waste%>% select(-year) 
+
 head(df_waste)
 ```
 
@@ -29,14 +42,46 @@ head(df_waste)
 ```{r}
 df_haz <- df_waste %>% filter(category == "Hazardous wastes")
 df_haz_tot <- df_haz %>% filter(stream == "Total")
-df_haz_total <- df_haz_tot %>% group_by(year,jurisdiction,category) %>% 
-  summarise(Tonnes = sum(tonnes)) %>% ungroup()
+df_haz_total <- df_haz_tot %>% group_by(start_year,jurisdiction,category) %>% 
+  summarise(Tonnes = sum(tonnes)) %>% 
+  ungroup() 
+
+
+
 ```
 
 
 ```{r}
-pl1 <- ggplot(data = df_haz_total,aes(x = year,y = Tonnes)) +
-  geom_point() + theme(axis.text.x = element_text(angle = 45,size=5)) + facet_wrap(~jurisdiction)
+pl1 <- ggplot(data = df_haz_total,aes(x = start_year,y = Tonnes)) +
+  geom_line() + geom_point(color='red') + theme(axis.text.x = element_text(angle = 45,size=5)) + facet_wrap(~jurisdiction) + labs(x = "Year",y = "Tons",title = "Hazardous waste generated in each state",subtitle = "2006-2021") + theme_classic()
 pl1
 ```
 
+1. NSW accounts for the highest hazardous waste in the whole of Australia with close to 8.5 MT. The hazardous wastes are on a rising trend.
+2. QLD is observed to record constant generation of hazardous waste each year with approximate 6 MT.
+3. VIC is observed to record a rising trend of hazardous waste in recent years with close to 5.75 MT in 2021.
+
+## How is the Hazardous waste dealt with in each state ?
+
+```{r}
+
+haz_jurisdictions <- c("NSW","Vic","Qld")
+df_haz_subset <- df_haz_tot %>% filter(jurisdiction %in% haz_jurisdictions)
+
+df_haz_man <- df_haz_subset %>% group_by(jurisdiction,management) %>% 
+  summarise(Tonnes = sum(tonnes)) %>% ungroup()
+
+
+pl2 <- ggplot(data = df_haz_man,aes(x = reorder(management,Tonnes),y = Tonnes/10^6)) + geom_col(fill = "lightgray",color = "black") + 
+  facet_wrap(~jurisdiction) + coord_flip() + geom_col(data = ~filter(.x, management == "Landfill"),fill = "darkred") + geom_label(data = ~filter(.x, management == "Landfill"),aes(label = round(Tonnes/10^6,1),hjust=1)) + geom_col(data = ~filter(.x, management == "Energy from waste facility"),fill = "green") + geom_label(data = ~filter(.x, management == "Landfill"),aes(label = round(Tonnes/10^6,1),hjust=1)) + geom_label(data = ~filter(.x, management == "Energy from waste facility"),aes(label = round(Tonnes/10^6,1),hjust=-0.5)) + 
+  labs(x = "Waste management technique",y = "Mega tonnes of waste",title ="Hazardous waste management in the top 3 \n waste producing states",subtitle = "2006-2021") + theme_economist() 
+pl2
+```
+
+We observe that the:
+
+1. In all the three states (NSW,Qld,Vic), majority of the hazardous waste are managed through disposing in landfills. While this may be a temporary solution, the implications can be quite devastating __as such waste normally take years to decompose and start polluting the water ways as well as pottable water resources.__
+
+2. While there have been efforts to utilise hazardous waste to produce energy, it is still a long way behind, with more concerted efforts required by each state to curb disposal of hazardous waste into landfills and obtain clean energy.
+
+3. While __VIC is observed to generate lesser hazardous waste than NSW and QLD, they're also leading with the highest energy production from waste facilities__ with approximately 1.6 Mega tonnes of waste utilised.
