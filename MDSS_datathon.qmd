@@ -78,6 +78,7 @@ pl2 <- ggplot(data = df_haz_man,aes(x = reorder(management,Tonnes),y = Tonnes/10
 pl2
 ```
 
+
 We observe that the:
 
 1. In all the three states (NSW,Qld,Vic), majority of the hazardous waste are managed through disposing in landfills. While this may be a temporary solution, the implications can be quite devastating __as such waste normally take years to decompose and start polluting the water ways as well as pottable water resources.__
@@ -85,3 +86,6 @@ We observe that the:
 2. While there have been efforts to utilise hazardous waste to produce energy, it is still a long way behind, with more concerted efforts required by each state to curb disposal of hazardous waste into landfills and obtain clean energy.
 
 3. While __VIC is observed to generate lesser hazardous waste than NSW and QLD, they're also leading with the highest energy production from waste facilities__ with approximately 1.6 Mega tonnes of waste utilised.
+
+
+# What is the constitution of these Hazardous wastes ?
