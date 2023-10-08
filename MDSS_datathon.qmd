@@ -1,6 +1,6 @@
 ---
 title: "MDSS Datathon"
-author: "Arindam Baruah"
+author: "Arindam Baruah, Aishwarya Anil Kumar"
 format: html
 editor: visual
 execute: 
@@ -15,13 +15,15 @@ library(visdat)
 library(janitor)
 library(plotly)
 library(ggthemes)
+library(scales)
+library(RColorBrewer)
 ```
-
 
 ```{r}
 df <- read_csv("data-raw/data_waste.csv")
 head(df)
 ```
+
 Let us clean the names of the variables
 
 ```{r}
@@ -50,16 +52,15 @@ df_haz_total <- df_haz_tot %>% group_by(start_year,jurisdiction,category) %>%
 
 ```
 
-
 ```{r}
 pl1 <- ggplot(data = df_haz_total,aes(x = start_year,y = Tonnes)) +
   geom_line() + geom_point(color='red') + theme(axis.text.x = element_text(angle = 45,size=5)) + facet_wrap(~jurisdiction) + labs(x = "Year",y = "Tons",title = "Hazardous waste generated in each state",subtitle = "2006-2021") + theme_classic()
 pl1
 ```
 
-1. NSW accounts for the highest hazardous waste in the whole of Australia with close to 8.5 MT. The hazardous wastes are on a rising trend.
-2. QLD is observed to record constant generation of hazardous waste each year with approximate 6 MT.
-3. VIC is observed to record a rising trend of hazardous waste in recent years with close to 5.75 MT in 2021.
+1.  NSW accounts for the highest hazardous waste in the whole of Australia with close to 8.5 MT. The hazardous wastes are on a rising trend.
+2.  QLD is observed to record constant generation of hazardous waste each year with approximate 6 MT.
+3.  VIC is observed to record a rising trend of hazardous waste in recent years with close to 5.75 MT in 2021.
 
 ## How is the Hazardous waste dealt with in each state ?
 
@@ -78,14 +79,62 @@ pl2 <- ggplot(data = df_haz_man,aes(x = reorder(management,Tonnes),y = Tonnes/10
 pl2
 ```
 
-
 We observe that the:
 
-1. In all the three states (NSW,Qld,Vic), majority of the hazardous waste are managed through disposing in landfills. While this may be a temporary solution, the implications can be quite devastating __as such waste normally take years to decompose and start polluting the water ways as well as pottable water resources.__
+1.  In all the three states (NSW,Qld,Vic), majority of the hazardous waste are managed through disposing in landfills. While this may be a temporary solution, the implications can be quite devastating **as such waste normally take years to decompose and start polluting the water ways as well as pottable water resources.**
 
-2. While there have been efforts to utilise hazardous waste to produce energy, it is still a long way behind, with more concerted efforts required by each state to curb disposal of hazardous waste into landfills and obtain clean energy.
+2.  While there have been efforts to utilise hazardous waste to produce energy, it is still a long way behind, with more concerted efforts required by each state to curb disposal of hazardous waste into landfills and obtain clean energy.
 
-3. While __VIC is observed to generate lesser hazardous waste than NSW and QLD, they're also leading with the highest energy production from waste facilities__ with approximately 1.6 Mega tonnes of waste utilised.
-
+3.  While **VIC is observed to generate lesser hazardous waste than NSW and QLD, they're also leading with the highest energy production from waste facilities** with approximately 1.6 Mega tonnes of waste utilised.
 
 # What is the constitution of these Hazardous wastes ?
+
+```{r}
+
+hazardous_waste_summary <- df_haz %>%
+  group_by(type) %>%
+  filter(jurisdiction %in% haz_jurisdictions) %>%
+  summarise(Total_Tonnage = sum(tonnes))
+
+hazardous_waste_summary <- hazardous_waste_summary %>%
+  filter(!is.na(type) & !is.na(Total_Tonnage))
+
+
+ggplot(hazardous_waste_summary, aes(x = reorder(type, Total_Tonnage), y = Total_Tonnage)) +
+
+  # Lollipop stems
+  geom_segment(aes(y = 0, 
+                   yend = Total_Tonnage, 
+                   x = reorder(type, Total_Tonnage),
+                   xend = reorder(type, Total_Tonnage)), 
+               color = "black", size = 1) +
+  
+  # Lollipop heads
+  geom_point(aes(fill = type), size = 6, shape = 21, color = "white") +
+
+  # Discrete color palette for lollipop heads
+  scale_fill_brewer(palette="Set3") +
+  
+  # Y-axis scale formatting
+  scale_y_continuous(labels = scales::label_comma()) +
+  
+  # Chart title and axes labels
+  labs(title = "Composition of Hazardous Wastes", 
+       x = "Type of Waste", 
+       y = "Total Tonnage") +
+
+  # Classic theme and customization
+  theme_classic() +
+  coord_flip() +
+  theme(legend.position = "none", 
+        axis.text.y = element_text(size = 8, color = "black"),
+        axis.title = element_text(face = "bold", size = 10),
+        plot.title = element_text(hjust = 0.5, face = "bold", size = 14),
+        panel.background = element_rect(fill = "white"),
+        panel.grid.minor.y = element_blank(),
+        panel.grid.major.y = element_blank(),
+        panel.grid.major.x = element_line(linewidth = 0.1, color = "yellow"))
+
+
+```
+
