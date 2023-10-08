@@ -17,6 +17,7 @@ library(plotly)
 library(ggthemes)
 library(scales)
 library(RColorBrewer)
+library(treemap)
 ```
 
 ```{r}
@@ -38,6 +39,28 @@ df_waste<- df_waste%>% select(-year)
 
 head(df_waste)
 ```
+# Waste per state
+
+
+```{r}
+
+df_waste_state <- df_waste %>% filter(stream == "Total") %>%  group_by(jurisdiction,type) %>%
+  summarise(Total_tonnes = sum(tonnes)) %>% filter(jurisdiction !="Australia")
+
+pl1 <- treemap(df_waste_state,
+            index=c("jurisdiction","type"),
+            vSize="Total_tonnes",
+        type = "index",title = "Waste generated among each states of Australia (2006-2021)") 
+
+pl1
+```
+We can observe that:
+
+1. WA leads the way in waste generation followed by NSW and QLD.
+2. While this maybe counter intuitive as WA has a considerably smaller population (2.67 million) when compared to NSW (8.16 million) and QLD (5.185 million), however, due to the presence of heavy industries such as mining, petroleum and chemicals, a significant amount of waste is generated in WA.
+3. The most common form of waste generated from each state are observed to be ash and rubble.
+
+
 
 # Hazardous waste
 
@@ -100,13 +123,13 @@ hazardous_waste_summary <- hazardous_waste_summary %>%
   filter(!is.na(type) & !is.na(Total_Tonnage))
 
 
-ggplot(hazardous_waste_summary, aes(x = reorder(type, Total_Tonnage), y = Total_Tonnage)) +
+ggplot(hazardous_waste_summary, aes(x = reorder(type, Total_Tonnage/10^6), y = Total_Tonnage/10^6)) +
 
   # Lollipop stems
   geom_segment(aes(y = 0, 
-                   yend = Total_Tonnage, 
-                   x = reorder(type, Total_Tonnage),
-                   xend = reorder(type, Total_Tonnage)), 
+                   yend = Total_Tonnage/10^6, 
+                   x = reorder(type, Total_Tonnage/10^6),
+                   xend = reorder(type, Total_Tonnage/10^6)), 
                color = "black", size = 1) +
   
   # Lollipop heads
@@ -121,7 +144,7 @@ ggplot(hazardous_waste_summary, aes(x = reorder(type, Total_Tonnage), y = Total_
   # Chart title and axes labels
   labs(title = "Composition of Hazardous Wastes", 
        x = "Type of Waste", 
-       y = "Total Tonnage") +
+       y = "Mega tonnes of waste") +
 
   # Classic theme and customization
   theme_classic() +
