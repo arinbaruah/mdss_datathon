@@ -45,6 +45,8 @@ head(df_waste)
 
 
 ```{r}
+df_waste_state <- df_waste %>% filter(stream == "Total") %>%  group_by(jurisdiction,category) %>%
+  summarise(Total_tonnes = sum(tonnes)) %>% filter(jurisdiction !="Australia" & category != "Total")
 
 df_waste_grouped <- df_waste_state %>% group_by(jurisdiction) %>% 
   summarise(Total_tonnes = sum(Total_tonnes))
@@ -77,9 +79,6 @@ We can observe that:
 
 
 ```{r}
-
-df_waste_state <- df_waste %>% filter(stream == "Total") %>%  group_by(jurisdiction,category) %>%
-  summarise(Total_tonnes = sum(tonnes)) %>% filter(jurisdiction !="Australia" & category != "Total")
 
 pl1 <- treemap(df_waste_state,
             index=c("category","jurisdiction"),
@@ -190,4 +189,40 @@ ggplot(hazardous_waste_summary, aes(x = reorder(type, Total_Tonnage/10^6), y = T
 
 
 ```
+```{r}
 
+haz_jurisdictions <- c("NSW","Vic","Qld")
+df_haz_subset <- df_haz_tot %>% filter(jurisdiction %in% haz_jurisdictions)
+
+df_state_total <- df_haz_tot %>% filter(jurisdiction %in% haz_jurisdictions) %>%
+  group_by(jurisdiction) %>%
+  mutate(total_waste_per_state = sum(tonnes)) %>%
+    select(jurisdiction, tonnes, management, total_waste_per_state) %>%
+  ungroup()
+
+df_haz_man <- df_state_total %>% 
+  filter(jurisdiction %in% haz_jurisdictions) %>%
+  group_by(jurisdiction, management) %>%
+  summarise(Tonnes = sum(tonnes)) %>%
+  left_join(df_state_total %>% 
+              group_by(jurisdiction) %>%
+              summarise(total_waste_per_state = sum(tonnes)), by = "jurisdiction") %>%
+  mutate(percent_by_management = round(Tonnes / total_waste_per_state * 100, 2)) %>%
+  select(jurisdiction, management, total_waste_per_state, Tonnes, percent_by_management)
+
+upper_limit <- ceiling(max(df_haz_man$percent_by_management, na.rm = TRUE) / 10) * 10
+
+pl2 <- ggplot(data = df_haz_man, aes(x = reorder(management, percent_by_management), y = percent_by_management)) + 
+  geom_col(fill = "lightgray", color = "yellow") + 
+  facet_wrap(~jurisdiction) + 
+  coord_flip() + 
+  geom_col(data = ~filter(.x, management == "Landfill"), fill = "darkred") + 
+  geom_label(data = ~filter(.x, management == "Landfill"), aes(label = round(percent_by_management, 1), hjust=1)) + 
+  geom_col(data = ~filter(.x, management == "Energy from waste facility"), fill = "green") + 
+  geom_label(data = ~filter(.x, management == "Energy from waste facility"), aes(label = round(percent_by_management, 1), hjust=-0.5)) + 
+  labs(x = "Waste management technique", y = "Total percentage of waste", title ="Hazardous waste management in the top 3 \n waste producing states", subtitle = "2006-2021") + 
+  theme_economist() + 
+  scale_y_continuous(breaks=seq(0, upper_limit, 10), labels = scales::label_number(scale = 1))
+
+pl2
+```
