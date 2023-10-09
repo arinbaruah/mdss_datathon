@@ -21,11 +21,18 @@ library(treemap)
 library(ozmaps)
 library(sf)
 ```
+# Key questions
+
+1. Which states are the leading waste generators in Australia ?
+
+
 
 ```{r}
 df <- read_csv("data-raw/data_waste.csv")
 head(df)
 ```
+
+
 
 Let us clean the names of the variables
 
@@ -45,6 +52,8 @@ head(df_waste)
 
 
 ```{r}
+df_waste_state <- df_waste %>% filter(stream == "Total") %>%  group_by(jurisdiction,category) %>%
+  summarise(Total_tonnes = sum(tonnes)) %>% filter(jurisdiction !="Australia" & category != "Total")
 
 df_waste_grouped <- df_waste_state %>% group_by(jurisdiction) %>% 
   summarise(Total_tonnes = sum(Total_tonnes))
@@ -86,7 +95,6 @@ pl1 <- treemap(df_waste_state,
             vSize="Total_tonnes",
         type = "index",title = "Types of waste in each state of Australia (2006-2021)") 
 
-pl1
 ```
 
 
@@ -190,11 +198,50 @@ ggplot(hazardous_waste_summary, aes(x = reorder(type, Total_Tonnage/10^6), y = T
 
 
 ```{r}
+
+
 df_haz_source <-df_haz %>% filter(jurisdiction %in% haz_jurisdictions,stream != "Total")
 
-df_haz_source_grouped <- df_haz_source %>% group_by(jurisdiction,type,stream) %>% summarise(Total_tonnes =  sum(tonnes))
+df_haz_source_grouped <- df_haz_source %>%  group_by(jurisdiction,type,stream) %>% summarise(Total_tonnes =  sum(tonnes))
 
-pl3 <- ggplot(data = df_haz_source_grouped %>% drop_na(),aes(x = reorder(type,Total_tonnes),y = Total_tonnes/10^6,fill = stream)) + geom_col() + coord_flip() + labs(x = "Type of hazardous waste",y = "Mega tonnes of waste",fill = "Source of waste") + theme_classic() + theme(panel.background = element_rect(fill = "cornsilk"), axis.text.x = element_text(size=5,face = "bold")) + facet_wrap(~jurisdiction) + ggtitle("Source of each form of hazardous waste",subtitle = "2006-2021")
+df_haz_source_grouped <- df_haz_source_grouped %>% mutate(stream = case_match(stream,
+                                                                              "C&D"~"Construction and Demolition",
+                                                                              "C&I" ~ "Commercial and Industrial"))
+
+pl3 <- ggplot(data = df_haz_source_grouped %>% drop_na(),
+              aes(
+                x = reorder(type, Total_tonnes),
+                y = Total_tonnes / 10 ^ 6,
+                fill = stream
+              )) + geom_col() + coord_flip() + labs(x = "Type of hazardous waste", y = "Mega tonnes of waste", fill = "Source of waste") + theme_classic() + theme(
+                panel.background = element_rect(fill = "cornsilk"),
+                axis.text.x = element_text(size = 6, face = "bold"),
+                axis.text.y = element_text(size = 6 , face = 'bold'),
+                legend.text = element_text(size = 6),
+                legend.position = "bottom"
+              ) + facet_wrap( ~jurisdiction) + ggtitle("Source of each form of hazardous waste", subtitle = "2006-2021") + scale_fill_brewer(palette = "Set2") + geom_col(data = ~filter(.x, type == "Asbestos (N220)"),color = "red") 
+
 pl3
 ```
 
+Asbestos has been observed to be clearly the differentiating factor for NSW hazardous waste generation when compared to QLD and VIC with close to equal contribution from the commercial & industrial and construction & demolition.
+
+
+How is Asbestos handled ?
+
+```{r}
+
+df_haz_source_fate <- df_haz_source %>% filter(type == "Asbestos (N220)") %>% 
+  group_by(jurisdiction,stream,fate) %>% 
+  summarise(Total_tonnes = sum(tonnes))
+
+df_haz_source_fate <- df_haz_source_fate %>% mutate(stream = case_match(stream,
+                                                                              "C&D"~"Construction and Demolition",
+                                                                              "C&I" ~ "Commercial and Industrial"))
+
+pl4 <- ggplot(data = df_haz_source_fate,aes(x = fate,y = Total_tonnes/10^6,fill = stream)) + 
+  geom_col(color = "black") + 
+  facet_wrap(~jurisdiction) + theme_minimal() + theme(panel.background = element_rect(fill = "cornsilk"),axis.text.x = element_text(angle =40,vjust = 0.8,size=6.5,face = "bold")) + labs(x ="Type of waste management",y = "Mega tonnes of waste",fill = "Source of waste") + ggtitle("Waste management of Asbestos in \n top Hazardous waste producing states",subtitle = "2006-2021") + scale_fill_brewer(palette = "Reds")
+pl4
+```
+We can observe that Asbestos does indeed pose a significant threat to the environment with no known techniques to either recycle or generate energy out of it. As a result, nearly all the generated waste out of Asbestos needs to be disposed in various landfills, consequently posing a serious threat to the environment.
