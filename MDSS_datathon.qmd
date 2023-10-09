@@ -165,9 +165,6 @@ ggplot(hazardous_waste_summary, aes(x = reorder(type, Total_Tonnage/10^6), y = T
   # Lollipop heads
   geom_point(aes(fill = type), size = 6, shape = 21, color = "white") +
 
-  # Discrete color palette for lollipop heads
-  scale_fill_brewer(palette="Set3") +
-  
   # Y-axis scale formatting
   scale_y_continuous(labels = scales::label_comma()) +
   
@@ -186,8 +183,18 @@ ggplot(hazardous_waste_summary, aes(x = reorder(type, Total_Tonnage/10^6), y = T
         panel.background = element_rect(fill = "cornsilk"),
         panel.grid.minor.y = element_blank(),
         panel.grid.major.y = element_blank(),
-        panel.grid.major.x = element_line(linewidth = 0.1, color = "yellow"))
+        panel.grid.major.x = element_line(linewidth = 0.1, color = "black"))
 
 
+```
+
+
+```{r}
+df_haz_source <-df_haz %>% filter(jurisdiction %in% haz_jurisdictions,stream != "Total")
+
+df_haz_source_grouped <- df_haz_source %>% group_by(jurisdiction,type,stream) %>% summarise(Total_tonnes =  sum(tonnes))
+
+pl3 <- ggplot(data = df_haz_source_grouped %>% drop_na(),aes(x = reorder(type,Total_tonnes),y = Total_tonnes/10^6,fill = stream)) + geom_col() + coord_flip() + labs(x = "Type of hazardous waste",y = "Mega tonnes of waste",fill = "Source of waste") + theme_classic() + theme(panel.background = element_rect(fill = "cornsilk"), axis.text.x = element_text(size=5,face = "bold")) + facet_wrap(~jurisdiction) + ggtitle("Source of each form of hazardous waste",subtitle = "2006-2021")
+pl3
 ```
 
