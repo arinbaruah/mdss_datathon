@@ -18,6 +18,8 @@ library(ggthemes)
 library(scales)
 library(RColorBrewer)
 library(treemap)
+library(ozmaps)
+library(sf)
 ```
 
 ```{r}
@@ -44,21 +46,49 @@ head(df_waste)
 
 ```{r}
 
-df_waste_state <- df_waste %>% filter(stream == "Total") %>%  group_by(jurisdiction,type) %>%
-  summarise(Total_tonnes = sum(tonnes)) %>% filter(jurisdiction !="Australia")
+df_waste_grouped <- df_waste_state %>% group_by(jurisdiction) %>% 
+  summarise(Total_tonnes = sum(Total_tonnes))
+df_waste_grouped <- df_waste_grouped %>% 
+  mutate(jurisdiction = case_match(jurisdiction, "ACT"~"Australian Capital Territory",
+                                                                          "NSW"~"New South Wales",
+                                                                          "Vic" ~ "Victoria",
+                                                                          "Qld" ~ "Queensland",
+                                                                          "SA" ~ "South Australia",
+                                                                          "WA" ~ "Western Australia",
+                                                                          "NT" ~ "Northern Territory",
+                                                                          "Tas" ~ "Tasmania"))
 
-pl1 <- treemap(df_waste_state,
-            index=c("jurisdiction","type"),
-            vSize="Total_tonnes",
-        type = "index",title = "Waste generated among each states of Australia (2006-2021)") 
 
-pl1
+sf_oz <- ozmap("states")
+sf_oz <- left_join(sf_oz,df_waste_grouped,by=c("NAME"="jurisdiction"))
+
+pl <- ggplot(data = sf_oz, aes(fill = Total_tonnes/10^6)) + geom_sf() + scale_fill_gradient(low ="green", high = "red")+
+  theme_classic() + labs(fill = "Total generated waste \n (Megatonnes)",title = "Waste generated in each state of Australia",
+                         subtitle = "2006-2021")
+pl
+
 ```
 We can observe that:
 
 1. WA leads the way in waste generation followed by NSW and QLD.
 2. While this maybe counter intuitive as WA has a considerably smaller population (2.67 million) when compared to NSW (8.16 million) and QLD (5.185 million), however, due to the presence of heavy industries such as mining, petroleum and chemicals, a significant amount of waste is generated in WA.
 3. The most common form of waste generated from each state are observed to be ash and rubble.
+
+
+
+```{r}
+
+df_waste_state <- df_waste %>% filter(stream == "Total") %>%  group_by(jurisdiction,category) %>%
+  summarise(Total_tonnes = sum(tonnes)) %>% filter(jurisdiction !="Australia" & category != "Total")
+
+pl1 <- treemap(df_waste_state,
+            index=c("category","jurisdiction"),
+            vSize="Total_tonnes",
+        type = "index",title = "Types of waste in each state of Australia (2006-2021)") 
+
+pl1
+```
+
 
 
 
@@ -76,8 +106,8 @@ df_haz_total <- df_haz_tot %>% group_by(start_year,jurisdiction,category) %>%
 ```
 
 ```{r}
-pl1 <- ggplot(data = df_haz_total,aes(x = start_year,y = Tonnes)) +
-  geom_line() + geom_point(color='red') + theme(axis.text.x = element_text(angle = 45,size=5)) + facet_wrap(~jurisdiction) + labs(x = "Year",y = "Tons",title = "Hazardous waste generated in each state",subtitle = "2006-2021") + theme_classic()
+pl1 <- ggplot(data = df_haz_total,aes(x = start_year,y = Tonnes/10^6)) +
+  geom_line() + geom_point(color='red') + theme(axis.text.x = element_text(angle = 45,size=5)) + facet_wrap(~jurisdiction) + labs(x = "Year",y = "Mega tonnes",title = "Hazardous waste generated in each state",subtitle = "2006-2021") + theme_classic()
 pl1
 ```
 
@@ -153,7 +183,7 @@ ggplot(hazardous_waste_summary, aes(x = reorder(type, Total_Tonnage/10^6), y = T
         axis.text.y = element_text(size = 8, color = "black"),
         axis.title = element_text(face = "bold", size = 10),
         plot.title = element_text(hjust = 0.5, face = "bold", size = 14),
-        panel.background = element_rect(fill = "white"),
+        panel.background = element_rect(fill = "cornsilk"),
         panel.grid.minor.y = element_blank(),
         panel.grid.major.y = element_blank(),
         panel.grid.major.x = element_line(linewidth = 0.1, color = "yellow"))
